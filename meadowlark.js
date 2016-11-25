@@ -7,34 +7,35 @@ app.set('view engine', 'handlebars');
 
 app.set('port', process.env.PORT || 3000);
 
+app.use(function(req, res, next){
+	res.locals.showTests = app.get('env') !== 'production' &&
+		req.query.test === '1';
+	next();
+})
+
 app.use(express.static(__dirname + '/public'));
 
 app.get('/', function(req, res){
 	res.render('home');
-    //res.type('text/plain');
-    //res.send('Meadowlark Travel');
 });
 
 app.get('/about', function(req, res){
-	res.render('about', {fortune: fortune.getFortune()});
-    //res.type('text/plain');
-    //res.send('О Meadowlark Travel');
+	res.render('about', {
+		fortune: fortune.getFortune(),
+		pageTestScript: '/qa/tests-about.js'
+	});
 });
 
 // пользовательская страница 404
 app.use(function(req, res, next){
-    //res.type('text/plain');
     res.status(404);
-    //res.send('404 — Не найдено');
     res.render('404');
 });
 
 // пользовательская страница 500
 app.use(function(err, req, res, next){
     console.error(err.stack);
-    //res.type('text/plain');
     res.status(500);
-    //res.send('500 — Ошибка сервера');
     res.render('500');
 });
 
